@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
+import { createAuthTokens, revokeUserSessions, setAuthCookies } from "@/lib/session"
 import { readUsers } from "@/lib/users"
 
 export async function POST(req: NextRequest) {
@@ -34,11 +35,17 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    return NextResponse.json({
+    await revokeUserSessions(user.email)
+
+    const response = NextResponse.json({
       success: true,
       message: "Login effettuato",
       user: { email: user.email },
     })
+
+    setAuthCookies(response, await createAuthTokens({ email: user.email }))
+
+    return response
   } catch {
     return NextResponse.json(
       { error: "Errore interno" },

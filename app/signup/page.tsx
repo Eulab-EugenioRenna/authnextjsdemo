@@ -69,7 +69,17 @@ export default function SignupPage() {
     }
 
     startTransition(() => {
-      router.push("/?registered=1")
+      const params = new URLSearchParams({
+        registered: "1",
+      })
+
+      const redirectTo = new URLSearchParams(window.location.search).get("redirect")
+
+      if (redirectTo) {
+        params.set("redirect", redirectTo)
+      }
+
+      router.push(`/?${params.toString()}`)
     })
   }
 

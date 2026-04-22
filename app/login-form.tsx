@@ -27,10 +27,11 @@ const formSchema = z.object({
 })
 
 type LoginFormProps = {
+  redirectTo?: string
   registered: boolean
 }
 
-export default function LoginForm({ registered }: LoginFormProps) {
+export default function LoginForm({ redirectTo, registered }: LoginFormProps) {
   const router = useRouter()
   const [submitError, setSubmitError] = useState("")
   const [isPending, startTransition] = useTransition()
@@ -61,8 +62,7 @@ export default function LoginForm({ registered }: LoginFormProps) {
     }
 
     startTransition(() => {
-      const email = encodeURIComponent(data.user.email)
-      router.push(`/welcome?email=${email}`)
+      router.push(redirectTo || "/welcome")
     })
   }
 
@@ -131,7 +131,13 @@ export default function LoginForm({ registered }: LoginFormProps) {
             Sign In
           </Button>
           <p className="text-center text-muted-foreground text-sm">
-            Don&apos;t have an account? <Link className="hover:underline" href="/signup">Sign up</Link>
+            Don&apos;t have an account?{" "}
+            <Link
+              className="hover:underline"
+              href={redirectTo ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : "/signup"}
+            >
+              Sign up
+            </Link>
           </p>
         </form>
       </Form>
